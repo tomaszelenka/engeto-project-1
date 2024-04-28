@@ -4,6 +4,9 @@ author: Tomáš Zelenka
 email: me@tomaszelenka.cz
 discord: .toze.
 '''
+
+import sys
+
 TEXTS = ['''
 Situated about 10 miles west of Kemmerer,
 Fossil Butte is a ruggedly impressive
@@ -36,12 +39,8 @@ dbusers = {"bob":"123", "ann":"pass123", "mike":"password123", "liz":"pass123"}
 lines = "-" * 23
 
 def count_words(sel):
-    words = TEXTS[sel].split()
-    result = [] 
-    for word in words:
-        word.strip(".,:;")
-        result.append(word)
-    return len(result)
+    words = [word.strip(".,:;") for word in TEXTS[sel].split()]
+    return len(words)
     
 def count_titlecase(sel):
     words = TEXTS[sel].split()
@@ -110,7 +109,14 @@ if input_usr in dbusers and dbusers[input_usr] == input_pasw:
      print(lines)
      choice = input("Enter a number btw. 1 and 3 to select:")
      print(lines)
-     if choice.isdigit() and (choice == '1' or choice == '2' or choice == '3'):
+     
+     if choice.isdigit() is not True:
+         sys.exit("Your choice is not a number, terminating the program.")
+     
+     elif choice.isdigit() and choice not in {'1', '2', '3'}:
+         sys.exit("Your choice is out of range, terminating the program.")  
+     
+     elif choice.isdigit() and (choice == '1' or choice == '2' or choice == '3'):
         choice = int(choice) - 1
         
         print(f"There are {count_words(choice)} words in the selected text.") 
@@ -121,15 +127,18 @@ if input_usr in dbusers and dbusers[input_usr] == input_pasw:
         print(f"The sum of all the numbers {sum_numeric(choice)}")
 
         grafdict = view_grafwords(choice)
+        print(lines)
         print("LEN|  OCCURENCES  |NR.")
         print(lines)
+        
         for i in grafdict:
-                print(f"{i}| {"*"*i + " " * (15-i)} |{grafdict[i]}")
-
-     elif choice.isdigit() is not True:
-         print("Your choice is not a number, terminating the program.")
-     elif choice.isdigit() and (choice != 1 or 2 or 3):
-         print("Your choice is out of range, terminating the program.")      
+                stars = "*" * grafdict[i] 
+                star_width = len(stars)
+                if grafdict[i] > 9:
+                    star_width-=1
+                nr_format = "|" + str(grafdict[i])
+                formatted_output = "{:>{}}| {:<{}} {:>{}}".format(i, 3, stars, 0, nr_format, 14 - star_width)
+                print(formatted_output)  
 
 else:
-    print("unregistered user or wrong password, terminating the program.")
+    sys.exit("unregistered user or wrong password, terminating the program.")
